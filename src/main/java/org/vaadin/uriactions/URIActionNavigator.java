@@ -7,20 +7,24 @@ import org.roklib.webapps.uridispatching.URIActionDispatcher;
 
 import com.vaadin.navigator.NavigationStateManager;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.Navigator.ComponentContainerViewDisplay;
+import com.vaadin.navigator.Navigator.SingleComponentContainerViewDisplay;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.navigator.ViewProvider;
+import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.SingleComponentContainer;
 import com.vaadin.ui.UI;
 
 public class URIActionNavigator
 {
-  private Navigator                  mNavigator;
-  private URIActionViewDisplay       mViewDisplay;
-  private URIActionViewProvider      mViewProvider;
-  private URIActionErrorViewProvider mErrorViewProvider;
-  private URIActionDispatcher        mURIActionDispatcher;
-  private AbstractURIActionCommand   mCurrentAction;
+  private Navigator                mNavigator;
+  private URIActionViewDisplay     mViewDisplay;
+  private URIActionViewProvider    mViewProvider;
+  private URIActionDispatcher      mURIActionDispatcher;
+  private AbstractURIActionCommand mCurrentAction;
+  private String                   mCurrentViewAndParameters;
 
   public URIActionNavigator (UI ui)
   {
@@ -34,9 +38,26 @@ public class URIActionNavigator
 
   public URIActionNavigator (UI ui, NavigationStateManager navigationStateManager, boolean useCaseSensitiveURIs)
   {
-    mViewDisplay = new URIActionViewDisplay ();
+    this (ui, navigationStateManager, useCaseSensitiveURIs, (ViewDisplay) null);
+  }
+
+  public URIActionNavigator (UI ui, NavigationStateManager navigationStateManager, boolean useCaseSensitiveURIs,
+      ComponentContainer container)
+  {
+    this (ui, navigationStateManager, useCaseSensitiveURIs, new ComponentContainerViewDisplay (container));
+  }
+
+  public URIActionNavigator (UI ui, NavigationStateManager navigationStateManager, boolean useCaseSensitiveURIs,
+      SingleComponentContainer container)
+  {
+    this (ui, navigationStateManager, useCaseSensitiveURIs, new SingleComponentContainerViewDisplay (container));
+  }
+
+  public URIActionNavigator (UI ui, NavigationStateManager navigationStateManager, boolean useCaseSensitiveURIs,
+      ViewDisplay viewDisplay)
+  {
+    mViewDisplay = new URIActionViewDisplay (viewDisplay);
     mViewProvider = new URIActionViewProvider ();
-    mErrorViewProvider = new URIActionErrorViewProvider ();
 
     if (navigationStateManager != null)
     {
@@ -46,8 +67,6 @@ public class URIActionNavigator
       mNavigator = new Navigator (ui, mViewDisplay);
     }
     mNavigator.addProvider (mViewProvider);
-    mNavigator.setErrorProvider (mErrorViewProvider);
-
     mURIActionDispatcher = new URIActionDispatcher (useCaseSensitiveURIs);
   }
 
@@ -61,12 +80,36 @@ public class URIActionNavigator
     return mNavigator;
   }
 
+  void resetCurrentAction ()
+  {
+    mCurrentAction = null;
+  }
+
+  public void replay ()
+  {
+    mNavigator.navigateTo (mCurrentViewAndParameters);
+  }
+
   private class URIActionViewDisplay implements ViewDisplay
   {
+    private ViewDisplay mUserProvidedDisplay;
+
+    public URIActionViewDisplay (ViewDisplay userProvidedDisplay)
+    {
+      mUserProvidedDisplay = userProvidedDisplay;
+    }
+
     @Override
     public void showView (View view)
     {
-      // TODO Auto-generated method stub
+      if (view instanceof ActionExecutionView)
+      {
+        // Nothing to do in this case. Action command is executed in ActionExecutionView.enter().
+        return;
+      } else if (mUserProvidedDisplay != null)
+      {
+        mUserProvidedDisplay.showView (view);
+      }
     }
   }
 
@@ -82,7 +125,15 @@ public class URIActionNavigator
             "Thread synchronization problem: this action navigator is currently handling another request.");
       }
       mCurrentAction = action;
-      return action == null ? null : viewAndParameters;
+      if (action != null)
+      {
+        mCurrentViewAndParameters = viewAndParameters;
+        return viewAndParameters;
+      } else
+      {
+        mCurrentViewAndParameters = null;
+        return null;
+      }
     }
 
     @Override
@@ -92,23 +143,7 @@ public class URIActionNavigator
     }
   }
 
-  private class URIActionErrorViewProvider implements ViewProvider
-  {
-    @Override
-    public String getViewName (String viewAndParameters)
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
-    @Override
-    public View getView (String viewName)
-    {
-      return null;
-    }
-  }
-
-  private class ActionExecutionView implements View
+  public class ActionExecutionView implements View
   {
     private AbstractURIActionCommand mCommand;
 
@@ -122,7 +157,22 @@ public class URIActionNavigator
     public void enter (ViewChangeEvent event)
     {
       mCommand.execute ();
-      mCurrentAction = null;
+      resetCurrentAction ();
     }
+
+    public AbstractURIActionCommand getURIActionCommand ()
+    {
+      return mCommand;
+    }
+  }
+
+  public String getCurrentlyHandledURI ()
+  {
+    return mCurrentViewAndParameters;
+  }
+
+  public URIActionDispatcher getURIActionDispatcher ()
+  {
+    return mURIActionDispatcher;
   }
 }
