@@ -2,7 +2,6 @@ package org.vaadin.uriactions;
 
 import org.roklib.util.helper.CheckForNull;
 import org.roklib.webapps.uridispatching.AbstractURIActionCommand;
-import org.roklib.webapps.uridispatching.AbstractURIActionHandler;
 import org.roklib.webapps.uridispatching.URIActionDispatcher;
 
 import com.vaadin.navigator.NavigationStateManager;
@@ -28,33 +27,25 @@ public class URIActionNavigator
 
   public URIActionNavigator (UI ui)
   {
-    this (ui, true);
+    this (ui, null);
   }
 
-  public URIActionNavigator (UI ui, boolean useCaseSensitiveURIs)
+  public URIActionNavigator (UI ui, NavigationStateManager navigationStateManager)
   {
-    this (ui, null, useCaseSensitiveURIs);
+    this (ui, navigationStateManager, (ViewDisplay) null);
   }
 
-  public URIActionNavigator (UI ui, NavigationStateManager navigationStateManager, boolean useCaseSensitiveURIs)
+  public URIActionNavigator (UI ui, NavigationStateManager navigationStateManager, ComponentContainer container)
   {
-    this (ui, navigationStateManager, useCaseSensitiveURIs, (ViewDisplay) null);
+    this (ui, navigationStateManager, new ComponentContainerViewDisplay (container));
   }
 
-  public URIActionNavigator (UI ui, NavigationStateManager navigationStateManager, boolean useCaseSensitiveURIs,
-      ComponentContainer container)
+  public URIActionNavigator (UI ui, NavigationStateManager navigationStateManager, SingleComponentContainer container)
   {
-    this (ui, navigationStateManager, useCaseSensitiveURIs, new ComponentContainerViewDisplay (container));
+    this (ui, navigationStateManager, new SingleComponentContainerViewDisplay (container));
   }
 
-  public URIActionNavigator (UI ui, NavigationStateManager navigationStateManager, boolean useCaseSensitiveURIs,
-      SingleComponentContainer container)
-  {
-    this (ui, navigationStateManager, useCaseSensitiveURIs, new SingleComponentContainerViewDisplay (container));
-  }
-
-  public URIActionNavigator (UI ui, NavigationStateManager navigationStateManager, boolean useCaseSensitiveURIs,
-      ViewDisplay viewDisplay)
+  public URIActionNavigator (UI ui, NavigationStateManager navigationStateManager, ViewDisplay viewDisplay)
   {
     mViewDisplay = new URIActionViewDisplay (viewDisplay);
     mViewProvider = new URIActionViewProvider ();
@@ -67,12 +58,6 @@ public class URIActionNavigator
       mNavigator = new Navigator (ui, mViewDisplay);
     }
     mNavigator.addProvider (mViewProvider);
-    mURIActionDispatcher = new URIActionDispatcher (useCaseSensitiveURIs);
-  }
-
-  public final void addHandler (AbstractURIActionHandler subHandler)
-  {
-    mURIActionDispatcher.addHandler (subHandler);
   }
 
   public Navigator getNavigator ()
@@ -118,11 +103,13 @@ public class URIActionNavigator
     @Override
     public String getViewName (String viewAndParameters)
     {
+      checkURIActionDispatcher ();
       AbstractURIActionCommand action = mURIActionDispatcher.getActionForURI (viewAndParameters);
       if (mCurrentAction != null)
       {
         throw new IllegalStateException (
-            "Thread synchronization problem: this action navigator is currently handling another request.");
+            "Thread synchronization problem: this action navigator is currently handling another request. Current action is: "
+                + mCurrentAction);
       }
       mCurrentAction = action;
       if (action != null)
@@ -156,8 +143,8 @@ public class URIActionNavigator
     @Override
     public void enter (ViewChangeEvent event)
     {
-      mCommand.execute ();
       resetCurrentAction ();
+      mCommand.execute ();
     }
 
     public AbstractURIActionCommand getURIActionCommand ()
@@ -171,8 +158,26 @@ public class URIActionNavigator
     return mCurrentViewAndParameters;
   }
 
+  public boolean hasURIActionDispatcher ()
+  {
+    return mURIActionDispatcher != null;
+  }
+
   public URIActionDispatcher getURIActionDispatcher ()
   {
     return mURIActionDispatcher;
+  }
+
+  public void setURIActionDispatcher (URIActionDispatcher dispatcher)
+  {
+    mURIActionDispatcher = dispatcher;
+  }
+
+  private void checkURIActionDispatcher ()
+  {
+    if (!hasURIActionDispatcher ())
+    {
+      throw new IllegalStateException ("No URI action dispatcher has been set for this object yet.");
+    }
   }
 }

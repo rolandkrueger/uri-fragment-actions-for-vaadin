@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.roklib.webapps.uridispatching.AbstractURIActionCommand;
 import org.roklib.webapps.uridispatching.SimpleURIActionHandler;
+import org.roklib.webapps.uridispatching.URIActionDispatcher;
 import org.vaadin.uriactions.testhelpers.TestNavigationStateHandler;
 import org.vaadin.uriactions.testhelpers.TestUI;
 
@@ -18,19 +19,22 @@ public class URIActionNavigatorTest
 {
   private URIActionNavigator         mTestObj;
   private TestNavigationStateHandler mNavigationStateHandler;
+  private URIActionDispatcher        mDispatcher;
 
   @Before
   public void setUp ()
   {
     mNavigationStateHandler = new TestNavigationStateHandler ();
-    mTestObj = new URIActionNavigator (new TestUI (), mNavigationStateHandler, true);
+    mTestObj = new URIActionNavigator (new TestUI (), mNavigationStateHandler);
+    mDispatcher = new URIActionDispatcher (true);
   }
 
   @Test
   public void testAddHandler ()
   {
     TestActionCommand cmd = new TestActionCommand ();
-    mTestObj.addHandler (new SimpleURIActionHandler ("test", cmd));
+    mDispatcher.addHandler (new SimpleURIActionHandler ("test", cmd));
+    mTestObj.setURIActionDispatcher (mDispatcher);
     mNavigationStateHandler.setState ("/test");
     mTestObj.getNavigator ().navigateTo ("/test");
     assertTrue ("Action command was not executed.", cmd.isExecuted ());
@@ -40,9 +44,10 @@ public class URIActionNavigatorTest
   public void testProvideOwnViewDisplay ()
   {
     TestViewDisplay viewDisplay = new TestViewDisplay ();
-    mTestObj = new URIActionNavigator (new TestUI (), mNavigationStateHandler, true, viewDisplay);
+    mTestObj = new URIActionNavigator (new TestUI (), mNavigationStateHandler, viewDisplay);
     TestActionCommand cmd = new TestActionCommand ();
-    mTestObj.addHandler (new SimpleURIActionHandler ("test", cmd));
+    mDispatcher.addHandler (new SimpleURIActionHandler ("test", cmd));
+    mTestObj.setURIActionDispatcher (mDispatcher);
     mTestObj.getNavigator ().addView ("separate_view", new View ()
     {
       @Override
@@ -54,6 +59,15 @@ public class URIActionNavigatorTest
     mTestObj.getNavigator ().navigateTo ("separate_view");
     assertTrue ("Separately provided view display was not activated.", viewDisplay.viewShown);
     assertFalse ("Action command was unexpectedly executed.", cmd.isExecuted ());
+  }
+
+  @Test
+  public void testHasURIActionDispatcher ()
+  {
+    assertFalse ("Action navigator unexpectedly has a URI action dispatcher object.",
+        mTestObj.hasURIActionDispatcher ());
+    mTestObj.setURIActionDispatcher (mDispatcher);
+    assertTrue ("Action navigator has no URI action dispatcher object.", mTestObj.hasURIActionDispatcher ());
   }
 
   private static class TestViewDisplay implements ViewDisplay
