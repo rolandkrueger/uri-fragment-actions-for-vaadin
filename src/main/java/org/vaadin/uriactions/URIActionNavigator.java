@@ -2,6 +2,7 @@ package org.vaadin.uriactions;
 
 import org.roklib.util.helper.CheckForNull;
 import org.roklib.webapps.uridispatching.AbstractURIActionCommand;
+import org.roklib.webapps.uridispatching.IURIActionHandler.ParameterMode;
 import org.roklib.webapps.uridispatching.URIActionDispatcher;
 
 import com.vaadin.navigator.NavigationStateManager;
@@ -24,6 +25,7 @@ public class URIActionNavigator
   private URIActionDispatcher      mURIActionDispatcher;
   private AbstractURIActionCommand mCurrentAction;
   private String                   mCurrentViewAndParameters;
+  private ParameterMode            mParameterMode = ParameterMode.DIRECTORY_WITH_NAMES;
 
   public URIActionNavigator (UI ui)
   {
@@ -58,6 +60,12 @@ public class URIActionNavigator
       mNavigator = new Navigator (ui, mViewDisplay);
     }
     mNavigator.addProvider (mViewProvider);
+  }
+
+  public void setParameterMode (ParameterMode parameterMode)
+  {
+    CheckForNull.check (parameterMode);
+    mParameterMode = parameterMode;
   }
 
   public Navigator getNavigator ()
@@ -104,7 +112,7 @@ public class URIActionNavigator
     public String getViewName (String viewAndParameters)
     {
       checkURIActionDispatcher ();
-      AbstractURIActionCommand action = mURIActionDispatcher.getActionForURI (viewAndParameters);
+      AbstractURIActionCommand action = mURIActionDispatcher.getActionForURI (viewAndParameters, mParameterMode);
       if (mCurrentAction != null)
       {
         throw new IllegalStateException (
