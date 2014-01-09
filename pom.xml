@@ -4,7 +4,7 @@
 	<groupId>org.vaadin.addons.uriactions</groupId>
 	<artifactId>uriactions</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>URIActions</name>
 
 	<url>http://www.rolandkrueger.info</url>
