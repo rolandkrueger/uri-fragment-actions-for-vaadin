@@ -19,6 +19,7 @@ public class UriFragmentActionNavigator {
     private final Navigator navigator;
     private UriActionMapperTree uriActionMapperTree;
     private UriActionCommand currentActionCommandObject;
+    private Object routingContext;
 
     public UriFragmentActionNavigator(final UI ui) {
         this(ui, null);
@@ -55,6 +56,10 @@ public class UriFragmentActionNavigator {
         uriActionMapperTree = dispatcher;
     }
 
+    public void setRoutingContext(final Object routingContext) {
+        this.routingContext = routingContext;
+    }
+
     private class UriActionViewDisplay implements ViewDisplay {
         private final ViewDisplay userProvidedDisplay;
 
@@ -77,7 +82,7 @@ public class UriFragmentActionNavigator {
             if (uriActionMapperTree == null) {
                 return null;
             }
-            final UriActionCommand action = uriActionMapperTree.interpretFragment(viewAndParameters, null, false);
+            final UriActionCommand action = uriActionMapperTree.interpretFragment(viewAndParameters, routingContext, false);
             if (currentActionCommandObject != null) {
                 throw new IllegalStateException(
                         "Thread synchronization problem: this action navigator is currently handling another request. Current action is: "
@@ -96,7 +101,7 @@ public class UriFragmentActionNavigator {
     public class ActionExecutionView implements View {
         private final UriActionCommand command;
 
-        public ActionExecutionView(final UriActionCommand command) {
+        ActionExecutionView(final UriActionCommand command) {
             Preconditions.checkNotNull(command);
             this.command = command;
         }
