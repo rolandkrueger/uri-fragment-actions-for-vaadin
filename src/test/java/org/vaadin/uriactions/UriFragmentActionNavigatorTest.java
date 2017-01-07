@@ -1,11 +1,14 @@
 package org.vaadin.uriactions;
 
 import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewDisplay;
 import org.junit.Before;
 import org.junit.Test;
 import org.roklib.urifragmentrouting.UriActionCommand;
 import org.roklib.urifragmentrouting.UriActionMapperTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.uriactions.testhelpers.TestNavigationStateHandler;
 import org.vaadin.uriactions.testhelpers.TestUI;
 
@@ -13,36 +16,51 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class UriFragmentActionNavigatorTest {
-    private UriFragmentActionNavigator testObj;
+    private final static Logger LOG = LoggerFactory.getLogger(UriFragmentActionNavigatorTest.class);
+
+    private UriFragmentActionNavigator uriFragmentActionNavigator;
     private TestNavigationStateHandler navigationStateHandler;
     private UriActionMapperTree uriActionMapperTree;
 
     @Before
     public void setUp() {
         navigationStateHandler = new TestNavigationStateHandler();
-        testObj = new UriFragmentActionNavigator(new TestUI(), navigationStateHandler);
+        uriFragmentActionNavigator = new UriFragmentActionNavigator(new TestUI(), navigationStateHandler);
         uriActionMapperTree = UriActionMapperTree.create().buildMapperTree().build();
     }
 
     @Test
     public void testAddHandler() {
-        final TestActionCommand cmd = new TestActionCommand();
-
         uriActionMapperTree = UriActionMapperTree.create().buildMapperTree()
                 .map("test")
                 .onAction(TestActionCommand.class)
                 .finishMapper().build();
 
-        testObj.setUriActionMapperTree(uriActionMapperTree);
+        uriFragmentActionNavigator.setUriActionMapperTree(uriActionMapperTree);
+        uriFragmentActionNavigator.getNavigator().addViewChangeListener(new ViewChangeListener() {
+            @Override
+            public boolean beforeViewChange(final ViewChangeEvent event) {
+                LOG.info("Before view change. New view: {}", event.getNewView());
+                return true;
+            }
+
+            @Override
+            public void afterViewChange(final ViewChangeEvent event) {
+                LOG.info("After view change. New view: {}", event.getNewView());
+                final UriFragmentActionNavigator.ActionExecutionView view = (UriFragmentActionNavigator.ActionExecutionView) event.getNewView();
+                final TestActionCommand uriActionCommand = (TestActionCommand) view.getUriActionCommand();
+                assertTrue("Action command was not executed.", uriActionCommand.isExecuted());
+            }
+        });
+
         navigationStateHandler.setState("/test");
-        testObj.getNavigator().navigateTo("/test");
-        assertTrue("Action command was not executed.", cmd.isExecuted());
+        uriFragmentActionNavigator.getNavigator().navigateTo("/test");
     }
 
     @Test
     public void testProvideOwnViewDisplay() {
         final TestViewDisplay viewDisplay = new TestViewDisplay();
-        testObj = new UriFragmentActionNavigator(new TestUI(), navigationStateHandler, viewDisplay);
+        uriFragmentActionNavigator = new UriFragmentActionNavigator(new TestUI(), navigationStateHandler, viewDisplay);
         final TestActionCommand cmd = new TestActionCommand();
 
         uriActionMapperTree = UriActionMapperTree.create().buildMapperTree()
@@ -50,11 +68,11 @@ public class UriFragmentActionNavigatorTest {
                 .onAction(TestActionCommand.class)
                 .finishMapper().build();
 
-        testObj.setUriActionMapperTree(uriActionMapperTree);
-        testObj.getNavigator().addView("separate_view", (View) event -> {
+        uriFragmentActionNavigator.setUriActionMapperTree(uriActionMapperTree);
+        uriFragmentActionNavigator.getNavigator().addView("separate_view", (View) event -> {
         });
 
-        testObj.getNavigator().navigateTo("separate_view");
+        uriFragmentActionNavigator.getNavigator().navigateTo("separate_view");
         assertTrue("Separately provided view display was not activated.", viewDisplay.viewShown);
         assertFalse("Action command was unexpectedly executed.", cmd.isExecuted());
     }
@@ -68,7 +86,7 @@ public class UriFragmentActionNavigatorTest {
         }
     }
 
-    private static class TestActionCommand implements UriActionCommand {
+    public static class TestActionCommand implements UriActionCommand {
         private boolean executed = false;
 
         @Override
