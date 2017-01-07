@@ -18,8 +18,7 @@ import org.roklib.urifragmentrouting.UriActionMapperTree;
 public class UriFragmentActionNavigator {
     private final Navigator navigator;
     private UriActionMapperTree uriActionMapperTree;
-    private UriActionCommand currentAction;
-    private String currentViewAndParameters;
+    private UriActionCommand currentActionCommandObject;
 
     public UriFragmentActionNavigator(final UI ui) {
         this(ui, null);
@@ -52,34 +51,8 @@ public class UriFragmentActionNavigator {
         return navigator;
     }
 
-    private void resetCurrentAction() {
-        currentAction = null;
-    }
-
-    public void replay() {
-        navigator.navigateTo(currentViewAndParameters);
-    }
-
-    public String getCurrentlyHandledUriFragment() {
-        return currentViewAndParameters;
-    }
-
-    public boolean hasUriActionDispatcher() {
-        return uriActionMapperTree != null;
-    }
-
-    public UriActionMapperTree getUriActionMapperTree() {
-        return uriActionMapperTree;
-    }
-
     public void setUriActionMapperTree(final UriActionMapperTree dispatcher) {
         uriActionMapperTree = dispatcher;
-    }
-
-    private void checkUriActionMapperTree() {
-        if (!hasUriActionDispatcher()) {
-            throw new IllegalStateException("No URI action mapper tree has been set for this object yet.");
-        }
     }
 
     private class UriActionViewDisplay implements ViewDisplay {
@@ -91,41 +64,36 @@ public class UriFragmentActionNavigator {
 
         @Override
         public void showView(final View view) {
-            if (view instanceof ActionExecutionView) {
-                // Nothing to do in this case. Action command is executed in ActionExecutionView.enter().
-            } else if (userProvidedDisplay != null) {
+            if (userProvidedDisplay != null && !(view instanceof ActionExecutionView)) {
                 userProvidedDisplay.showView(view);
             }
+            // Otherwise there is nothing to do in this case. Action command is executed in ActionExecutionView.enter().
         }
     }
 
     private class UriActionViewProvider implements ViewProvider {
         @Override
         public String getViewName(final String viewAndParameters) {
-            checkUriActionMapperTree();
-            final UriActionCommand action = uriActionMapperTree.interpretFragment(viewAndParameters);
-            if (currentAction != null) {
-                throw new IllegalStateException(
-                        "Thread synchronization problem: this action navigator is currently handling another request. Current action is: "
-                                + currentAction);
-            }
-            currentAction = action;
-            if (action != null) {
-                currentViewAndParameters = viewAndParameters;
-                return viewAndParameters;
-            } else {
-                currentViewAndParameters = null;
+            if (uriActionMapperTree == null) {
                 return null;
             }
+            final UriActionCommand action = uriActionMapperTree.interpretFragment(viewAndParameters);
+            if (currentActionCommandObject != null) {
+                throw new IllegalStateException(
+                        "Thread synchronization problem: this action navigator is currently handling another request. Current action is: "
+                                + currentActionCommandObject);
+            }
+            currentActionCommandObject = action;
+            return action != null ? viewAndParameters : null;
         }
 
         @Override
         public View getView(final String viewName) {
-            return new ActionExecutionView(currentAction);
+            return new ActionExecutionView(currentActionCommandObject);
         }
     }
 
-    private class ActionExecutionView implements View {
+    public class ActionExecutionView implements View {
         private final UriActionCommand command;
 
         public ActionExecutionView(final UriActionCommand command) {
@@ -135,8 +103,7 @@ public class UriFragmentActionNavigator {
 
         @Override
         public void enter(final ViewChangeEvent event) {
-            resetCurrentAction();
-            command.run(); // TODO: command has already been executed
+            currentActionCommandObject = null;
         }
 
         public UriActionCommand getUriActionCommand() {
