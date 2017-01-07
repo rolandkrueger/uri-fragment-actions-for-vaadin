@@ -77,7 +77,7 @@ public class UriFragmentActionNavigator {
             if (uriActionMapperTree == null) {
                 return null;
             }
-            final UriActionCommand action = uriActionMapperTree.interpretFragment(viewAndParameters);
+            final UriActionCommand action = uriActionMapperTree.interpretFragment(viewAndParameters, null, false);
             if (currentActionCommandObject != null) {
                 throw new IllegalStateException(
                         "Thread synchronization problem: this action navigator is currently handling another request. Current action is: "
@@ -103,6 +103,7 @@ public class UriFragmentActionNavigator {
 
         @Override
         public void enter(final ViewChangeEvent event) {
+            command.run();
             currentActionCommandObject = null;
         }
 
