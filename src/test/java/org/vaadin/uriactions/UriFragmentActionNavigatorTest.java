@@ -59,14 +59,6 @@ public class UriFragmentActionNavigatorTest {
         assertFalse("Action command was unexpectedly executed.", cmd.isExecuted());
     }
 
-    @Test
-    public void testHasURIActionDispatcher() {
-        assertFalse("Action navigator unexpectedly has a URI action dispatcher object.",
-                testObj.hasUriActionDispatcher());
-        testObj.setUriActionMapperTree(uriActionMapperTree);
-        assertTrue("Action navigator has no URI action dispatcher object.", testObj.hasUriActionDispatcher());
-    }
-
     private static class TestViewDisplay implements ViewDisplay {
         public boolean viewShown = false;
 
