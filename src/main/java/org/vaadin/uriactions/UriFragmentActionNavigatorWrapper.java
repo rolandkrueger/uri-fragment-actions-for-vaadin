@@ -15,29 +15,29 @@ import com.vaadin.ui.UI;
 import org.roklib.urifragmentrouting.UriActionCommand;
 import org.roklib.urifragmentrouting.UriActionMapperTree;
 
-public class UriFragmentActionNavigator {
+public class UriFragmentActionNavigatorWrapper {
     private final Navigator navigator;
     private UriActionMapperTree uriActionMapperTree;
     private UriActionCommand currentActionCommandObject;
     private Object routingContext;
 
-    public UriFragmentActionNavigator(final UI ui) {
+    public UriFragmentActionNavigatorWrapper(final UI ui) {
         this(ui, null);
     }
 
-    public UriFragmentActionNavigator(final UI ui, final NavigationStateManager navigationStateManager) {
+    public UriFragmentActionNavigatorWrapper(final UI ui, final NavigationStateManager navigationStateManager) {
         this(ui, navigationStateManager, (ViewDisplay) null);
     }
 
-    public UriFragmentActionNavigator(final UI ui, final NavigationStateManager navigationStateManager, final ComponentContainer container) {
+    public UriFragmentActionNavigatorWrapper(final UI ui, final NavigationStateManager navigationStateManager, final ComponentContainer container) {
         this(ui, navigationStateManager, new ComponentContainerViewDisplay(container));
     }
 
-    public UriFragmentActionNavigator(final UI ui, final NavigationStateManager navigationStateManager, final SingleComponentContainer container) {
+    public UriFragmentActionNavigatorWrapper(final UI ui, final NavigationStateManager navigationStateManager, final SingleComponentContainer container) {
         this(ui, navigationStateManager, new SingleComponentContainerViewDisplay(container));
     }
 
-    public UriFragmentActionNavigator(final UI ui, final NavigationStateManager navigationStateManager, final ViewDisplay viewDisplay) {
+    public UriFragmentActionNavigatorWrapper(final UI ui, final NavigationStateManager navigationStateManager, final ViewDisplay viewDisplay) {
         final UriActionViewDisplay uriActionViewDisplay = new UriActionViewDisplay(viewDisplay);
 
         if (navigationStateManager != null) {
