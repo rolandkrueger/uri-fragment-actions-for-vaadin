@@ -1,15 +1,19 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>org.vaadin.addons.uriactions</groupId>
     <artifactId>uri-fragment-actions-for-vaadin</artifactId>
     <packaging>jar</packaging>
     <version>2.0.0-SNAPSHOT</version>
-    <name>URI Fragment Actions for Vaadin</name>
 
-    <url>https://github.com/rolandkrueger/uri-fragment-actions-for-vaadin</url>
+    <name>URI Fragment Actions for Vaadin</name>
+    <description>Wrapper class around a Vaadin Navigator which allows using URI fragment actions. By this, it is
+        possible to use more complex view names than customary with Vaadin's navigator. Furthermore, you can
+        parameterize URI fragments and interpret the parameter values in a type-safe way.
+    </description>
     <inceptionYear>2013</inceptionYear>
-    <description>TODO</description>
+    <url>https://github.com/rolandkrueger/uri-fragment-actions-for-vaadin</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
