@@ -51,7 +51,7 @@ public class UriFragmentActionNavigatorWrapperTest {
             @Override
             public void afterViewChange(final ViewChangeEvent event) {
                 LOG.info("After view change. New view: {}", event.getNewView());
-                final UriFragmentActionNavigatorWrapper.ActionExecutionView view = (UriFragmentActionNavigatorWrapper.ActionExecutionView) event.getNewView();
+                final ActionExecutionView view = (ActionExecutionView) event.getNewView();
                 final TestActionCommand uriActionCommand = (TestActionCommand) view.getUriActionCommand();
                 assertTrue("Action command was not executed.", uriActionCommand.isExecuted());
                 assertThat(uriActionCommand.getRoutingContext().getData(), equalTo("contextData"));
@@ -66,7 +66,6 @@ public class UriFragmentActionNavigatorWrapperTest {
     public void testProvideOwnViewDisplay() {
         final TestViewDisplay viewDisplay = new TestViewDisplay();
         uriFragmentActionNavigatorWrapper = new UriFragmentActionNavigatorWrapper(new TestUI(), navigationStateHandler, viewDisplay);
-        final TestActionCommand cmd = new TestActionCommand();
 
         uriActionMapperTree = UriActionMapperTree.create().buildMapperTree()
                 .map("test")
@@ -76,10 +75,20 @@ public class UriFragmentActionNavigatorWrapperTest {
         uriFragmentActionNavigatorWrapper.setUriActionMapperTree(uriActionMapperTree);
         uriFragmentActionNavigatorWrapper.getNavigator().addView("separate_view", (View) event -> {
         });
+        uriFragmentActionNavigatorWrapper.getNavigator().addViewChangeListener(new ViewChangeListener() {
+            @Override
+            public boolean beforeViewChange(final ViewChangeEvent event) {
+                return true;
+            }
+
+            @Override
+            public void afterViewChange(final ViewChangeEvent event) {
+                assertFalse(event.getNewView() instanceof ActionExecutionView);
+            }
+        });
 
         uriFragmentActionNavigatorWrapper.getNavigator().navigateTo("separate_view");
         assertTrue("Separately provided view display was not activated.", viewDisplay.viewShown);
-        assertFalse("Action command was unexpectedly executed.", cmd.isExecuted());
     }
 
     private static class TestViewDisplay implements ViewDisplay {
