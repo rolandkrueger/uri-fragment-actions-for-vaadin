@@ -155,14 +155,4 @@
         </plugins>
     </reporting>
 
-    <repositories>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>bintray-rolandkrueger-maven</id>
-            <name>bintray</name>
-            <url>http://dl.bintray.com/rolandkrueger/maven</url>
-        </repository>
-    </repositories>
 </project>
