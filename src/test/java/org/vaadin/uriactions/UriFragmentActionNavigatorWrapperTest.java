@@ -36,7 +36,7 @@ public class UriFragmentActionNavigatorWrapperTest {
     public void testUriFragmentActionNavigator() {
         uriActionMapperTree = UriActionMapperTree.create().buildMapperTree()
                 .map("test")
-                .onAction(TestActionCommand.class)
+                .onActionFactory(TestActionCommand::new)
                 .finishMapper().build();
 
         uriFragmentActionNavigatorWrapper.setUriActionMapperTree(uriActionMapperTree);
@@ -69,7 +69,7 @@ public class UriFragmentActionNavigatorWrapperTest {
 
         uriActionMapperTree = UriActionMapperTree.create().buildMapperTree()
                 .map("test")
-                .onAction(TestActionCommand.class)
+                .onActionFactory(TestActionCommand::new)
                 .finishMapper().build();
 
         uriFragmentActionNavigatorWrapper.setUriActionMapperTree(uriActionMapperTree);
