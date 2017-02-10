@@ -41,12 +41,12 @@ import org.roklib.urifragmentrouting.UriActionMapperTree;
  * developer will directly work with a two-dimensional coordinate object instead of two Strings. <h1>Accessing the
  * current {@link UriActionCommand} object</h1> It may be necessary for an application to access the {@link
  * UriActionCommand} object for the currently interpreted URI fragment. This object is not directly accessible. It can
- * be accessed, however, with a {@link com.vaadin.navigator.ViewChangeListener} added to the wrapped {@link Navigator}.
- * In the listener's methods {@link com.vaadin.navigator.ViewChangeListener#beforeViewChange(ViewChangeEvent)} and
- * {@link com.vaadin.navigator.ViewChangeListener#afterViewChange(ViewChangeEvent)} you can check whether the new or old
- * view is of type {@link ActionExecutionView} and if so cast it into this class. You can then retrieve the current
- * {@link UriActionCommand} with {@link ActionExecutionView#getUriActionCommand()}. Refer to the following example
- * code:
+ * be accessed, however, with a {@link com.vaadin.navigator.ViewChangeListener ViewChangeListener} added to the wrapped
+ * {@link Navigator}. In the listener's methods {@link com.vaadin.navigator.ViewChangeListener#beforeViewChange(ViewChangeEvent)
+ * ViewChangeListener#beforeViewChange(ViewChangeEvent)} and {@link com.vaadin.navigator.ViewChangeListener#afterViewChange(ViewChangeEvent)
+ * ViewChangeListener#afterViewChange(ViewChangeEvent)} you can check whether the new or old view is of type {@link
+ * ActionExecutionView} and if so cast it into this class. You can then retrieve the current {@link UriActionCommand}
+ * with {@link ActionExecutionView#getUriActionCommand()}. Refer to the following example code:
  * <pre>
  *    uriFragmentActionNavigatorWrapper.getNavigator().addViewChangeListener(new ViewChangeListener() {
  *        public boolean beforeViewChange(final ViewChangeEvent event) {
@@ -64,18 +64,18 @@ import org.roklib.urifragmentrouting.UriActionMapperTree;
  * </pre>
  * <h1>The Routing Context</h1> The routing context is an arbitrary user-defined object which can be passed into the URI
  * fragment interpretation process of the {@link UriActionMapperTree}. This object can be injected into the resolved
- * {@link UriActionCommand} with a method annotated with {@link org.roklib.urifragmentrouting.annotation.RoutingContext}.
- * By that, this context object can be accessed and used by the action command objects when they are executed. The
- * routing context can be used, for instance, to provide the action commands with references to service classes, such as
- * the current event bus etc. <h1>Using an alternative {@link ViewDisplay}</h1> This wrapper class provides several
- * constructors, which relate directly to the various overloaded constructors of class {@link Navigator}. Using these
- * constructors, you can add an alternative {@link ViewDisplay} to the wrapped navigator which will be used in parallel
- * with the {@link UriActionMapperTree}. If the current URI fragment could not be successfully resolved by the {@link
- * UriActionMapperTree}, the navigator tries to resolve it with the alternative {@link ViewProvider} which is
- * automatically installed when an extra {@link ViewDisplay} is set on the navigator. Using this technique, you can
- * still add views in the customary Vaadin-style where this very simple view resolution is sufficient. Using the {@link
- * UriActionMapperTree} can then be reserved for the more complex cases where the standard Vaadin mechanism is not
- * flexible enough.
+ * {@link UriActionCommand} with a method annotated with {@link org.roklib.urifragmentrouting.annotation.RoutingContext
+ * RoutingContext}. By that, this context object can be accessed and used by the action command objects when they are
+ * executed. The routing context can be used, for instance, to provide the action commands with references to service
+ * classes, such as the current event bus etc. <h1>Using an alternative {@link ViewDisplay}</h1> This wrapper class
+ * provides several constructors, which relate directly to the various overloaded constructors of class {@link
+ * Navigator}. Using these constructors, you can add an alternative {@link ViewDisplay} to the wrapped navigator which
+ * will be used in parallel with the {@link UriActionMapperTree}. If the current URI fragment could not be successfully
+ * resolved by the {@link UriActionMapperTree}, the navigator tries to resolve it with the alternative {@link
+ * ViewProvider} which is automatically installed when an extra {@link ViewDisplay} is set on the navigator. Using this
+ * technique, you can still add views in the customary Vaadin-style where this very simple view resolution is
+ * sufficient. Using the {@link UriActionMapperTree} can then be reserved for the more complex cases where the standard
+ * Vaadin mechanism is not flexible enough.
  *
  * @see UriActionMapperTree
  * @see UriActionCommand
@@ -91,35 +91,18 @@ public class UriFragmentActionNavigatorWrapper {
     private Object routingContext;
 
     /**
-     * Constructs a new navigator wrapper for the given {@link UI} object. This will create the wrapped navigator with
-     * the constructor {@link Navigator#Navigator(UI, ViewDisplay)}.
+     * Constructs a new navigator wrapper for the given {@link UI} object. When this constructor is used, the wrapped
+     * {@link Navigator} will only be able to handle URI fragments with a given {@link UriActionMapperTree}. No fallback
+     * {@link ViewDisplay} is used.
      *
      * @param ui the current {@link UI}
      */
     public UriFragmentActionNavigatorWrapper(final UI ui) {
-        this(ui, null);
+        this(ui, null, null);
     }
 
     /**
-     * Constructs a new navigator wrapper for the given {@link UI} object and {@link NavigationStateManager}. If the
-     * given {@link NavigationStateManager} is not {@code null}, this will create the wrapped navigator with the
-     * constructor {@link Navigator#Navigator(UI, NavigationStateManager, ViewDisplay)}. Otherwise, the constructor
-     * {@link Navigator#Navigator(UI, ViewDisplay)} is used to create the navigator.
-     *
-     * @param ui                     the current {@link UI}
-     * @param navigationStateManager the {@link NavigationStateManager} keeping track of the active view and enabling
-     *                               bookmarking and direct navigation. May be {@code null} to use the default
-     *                               navigation state manager.
-     */
-    public UriFragmentActionNavigatorWrapper(final UI ui, final NavigationStateManager navigationStateManager) {
-        this(ui, navigationStateManager, (ViewDisplay) null);
-    }
-
-    /**
-     * Constructs a new navigator wrapper for the given {@link UI} object and {@link NavigationStateManager}. If the
-     * given {@link NavigationStateManager} is not {@code null}, this will create the wrapped navigator with the
-     * constructor {@link Navigator#Navigator(UI, NavigationStateManager, ViewDisplay)}. Otherwise, the constructor
-     * {@link Navigator#Navigator(UI, ViewDisplay)} is used to create the navigator.
+     * Constructs a new navigator wrapper for the given {@link UI} object.
      * <p>
      * This constructor allows to specify a {@link ComponentContainer} which will be wrapped by a {@link
      * ComponentContainerViewDisplay} and will be used to display any {@link View} which has not been determined by the
@@ -127,24 +110,17 @@ public class UriFragmentActionNavigatorWrapper {
      * with {@link Navigator#addProvider(ViewProvider)}, {@link Navigator#addView(String, Class)}, or {@link
      * Navigator#addView(String, View)}.
      *
-     * @param ui                     the current {@link UI}
-     * @param navigationStateManager the {@link NavigationStateManager} keeping track of the active view and enabling
-     *                               bookmarking and direct navigation. May be {@code null} to use the default
-     *                               navigation state manager.
-     * @param container              a {@link ComponentContainer} which will be wrapped by a {@link
-     *                               ComponentContainerViewDisplay}. This view display is used as an alternative {@link
-     *                               ViewDisplay} (see {@link #UriFragmentActionNavigatorWrapper(UI,
-     *                               NavigationStateManager, ViewDisplay)}.
+     * @param ui        the current {@link UI}
+     * @param container a {@link ComponentContainer} which will be wrapped by a {@link ComponentContainerViewDisplay}.
+     *                  This view display is used as an alternative {@link ViewDisplay} (see {@link
+     *                  #UriFragmentActionNavigatorWrapper(UI, NavigationStateManager, ViewDisplay)}.
      */
-    public UriFragmentActionNavigatorWrapper(final UI ui, final NavigationStateManager navigationStateManager, final ComponentContainer container) {
-        this(ui, navigationStateManager, new ComponentContainerViewDisplay(container));
+    public UriFragmentActionNavigatorWrapper(final UI ui, final ComponentContainer container) {
+        this(ui, null, new ComponentContainerViewDisplay(container));
     }
 
     /**
-     * Constructs a new navigator wrapper for the given {@link UI} object and {@link NavigationStateManager}. If the
-     * given {@link NavigationStateManager} is not {@code null}, this will create the wrapped navigator with the
-     * constructor {@link Navigator#Navigator(UI, NavigationStateManager, ViewDisplay)}. Otherwise, the constructor
-     * {@link Navigator#Navigator(UI, ViewDisplay)} is used to create the navigator.
+     * Constructs a new navigator wrapper for the given {@link UI} object.
      * <p>
      * This constructor allows to specify a {@link SingleComponentContainer} which will be wrapped by a {@link
      * SingleComponentContainerViewDisplay} and will be used to display any {@link View} which has not been determined
@@ -152,17 +128,14 @@ public class UriFragmentActionNavigatorWrapper {
      * navigator with {@link Navigator#addProvider(ViewProvider)}, {@link Navigator#addView(String, Class)}, or {@link
      * Navigator#addView(String, View)}.
      *
-     * @param ui                     the current {@link UI}
-     * @param navigationStateManager the {@link NavigationStateManager} keeping track of the active view and enabling
-     *                               bookmarking and direct navigation. May be {@code null} to use the default
-     *                               navigation state manager.
-     * @param container              a {@link SingleComponentContainer} which will be wrapped by a {@link
-     *                               SingleComponentContainerViewDisplay}. This view display is used as an alternative
-     *                               {@link ViewDisplay} (see {@link #UriFragmentActionNavigatorWrapper(UI,
-     *                               NavigationStateManager, ViewDisplay)}.
+     * @param ui        the current {@link UI}
+     * @param container a {@link SingleComponentContainer} which will be wrapped by a {@link
+     *                  SingleComponentContainerViewDisplay}. This view display is used as an alternative {@link
+     *                  ViewDisplay} (see {@link #UriFragmentActionNavigatorWrapper(UI, NavigationStateManager,
+     *                  ViewDisplay)}.
      */
-    public UriFragmentActionNavigatorWrapper(final UI ui, final NavigationStateManager navigationStateManager, final SingleComponentContainer container) {
-        this(ui, navigationStateManager, new SingleComponentContainerViewDisplay(container));
+    public UriFragmentActionNavigatorWrapper(final UI ui, final SingleComponentContainer container) {
+        this(ui, null, new SingleComponentContainerViewDisplay(container));
     }
 
     /**
