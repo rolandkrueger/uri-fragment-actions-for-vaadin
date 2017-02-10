@@ -14,6 +14,8 @@ For example, it is possible to use URI fragments like the following:
 ```
 
 As you can see, these URI fragments form a hierarchy where each individual path element can have an arbitrary number of parameters.
+
+This add-on requires Java 8 as a minimum.
   
 Background
 ----------
