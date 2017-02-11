@@ -58,7 +58,7 @@ To do that, you can add custom view classes or `ViewProvider` objects to the wra
 
 For detailed information about the individual features of class `UriActionMapperTree` and how to create and configure an instance of this class, please consult the `uri-fragment-routing` library's http://roklib.org/usage.html[user manual].
 
-A `UriActionMapperTree` is thread-safe and can be shared by all `UI` objects. It is therefore important that the action mapper tree object is created with application-scope (e. g. as a static singleton or using an application-scoped service). It should be avoided to create this instance in the `init()`-method of your application's `UI` class. This would unnecessarily waste a lot of memory.
+A `UriActionMapperTree` is thread-safe and can be shared by all `UI` objects. It is therefore important that the action mapper tree object is created with application-scope (e. g. as a static singleton or using an application-scoped service). It should be avoided to create this instance in the `init()`-method of your application's `UI` class. This would unnecessarily waste a lot of memory. A consequence of this is that this application-scoped URI action mapper tree needs to be configured in such a way that it can handle any valid URI fragment of an application. Access control needs to be implemented either on the level of the action commands or on the service layer.
 
 When you have created a `UriActionMapperTree` object, you can pass it to the navigator wrapper with `setUriActionMapperTree()`. We will look at a simple example where we want to build an action mapper tree which is able to handle the following URI fragments:
 
