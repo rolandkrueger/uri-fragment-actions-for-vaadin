@@ -28,7 +28,7 @@ This Vaadin add-on simply consists of a single wrapper class around a common Vaa
   
 This library uses a different approach for interpreting URI fragments than the standard Vaadin `Navigator`. While the `Navigator` tries to extract a view name from the URI fragment, the `uri-fragment-routing` library interprets a URI fragment completely and tries to resolve it into an _action command class_. If such a class could be found for a given URI fragment, it is instantiated and executed. Thus, this library uses the _Command Design Pattern_, while the hierarchical URI fragments are interpreted using the _Chain of Responsibility Design Pattern_.
 
-For details about the correct usage of the library `uri-fragment-routing`, please consult the documentation provided on the library's https://github.com/rolandkrueger/uri-fragment-routing[project page].
+For details about the correct usage of the library `uri-fragment-routing`, please consult the documentation provided on the library's http://www.roklib.org/uri-fragment-routing/index.html[project page].
 
 == How to Use the Add-on
 
@@ -56,7 +56,7 @@ To do that, you can add custom view classes or `ViewProvider` objects to the wra
 
 === Assembling a URI Action Mapper Tree
 
-For detailed information about the individual features of class `UriActionMapperTree` and how to create and configure an instance of this class, please consult the `uri-fragment-routing` library's http://roklib.org/usage.html[user manual].
+For detailed information about the individual features of class `UriActionMapperTree` and how to create and configure an instance of this class, please consult the `uri-fragment-routing` library's http://www.roklib.org/uri-fragment-routing/usage.html[user manual].
 
 A `UriActionMapperTree` is thread-safe and can be shared by all `UI` objects. It is therefore important that the action mapper tree object is created with application-scope (e. g. as a static singleton or using an application-scoped service). It should be avoided to create this instance in the `init()`-method of your application's `UI` class. This would unnecessarily waste a lot of memory. A consequence of this is that this application-scoped URI action mapper tree needs to be configured in such a way that it can handle any valid URI fragment of an application. Access control needs to be implemented either on the level of the action commands or on the service layer.
 

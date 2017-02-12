@@ -36,4 +36,4 @@ This Vaadin add-on only consists of a single wrapper class around a common Vaadi
   
 This library uses a different approach for interpreting URI fragments than the standard Vaadin Navigator. While the Navigator tries to extract a view name from the URI fragment, the `uri-fragment-routing` interprets the complete URI fragment and tries to resolve it into an *action command class*. If such a class could be found for a given URI fragment, it is instantiated and executed. Thus, this library uses the *Command Design Pattern*, while the hierarchical URI fragments are interpreted using the *Chain of Responsibility Design Pattern*.
 
-For details about the correct usage of the library `uri-fragment-routing`, please consult the documentation provided on the library's [project page](https://github.com/rolandkrueger/uri-fragment-routing).
+For details about the correct usage of the library `uri-fragment-routing`, please consult the documentation provided on the library's [project page](http://www.roklib.org/uri-fragment-routing/index.html).
