@@ -28,7 +28,7 @@ public class UriFragmentActionNavigatorWrapperTest {
     @Before
     public void setUp() {
         navigationStateHandler = new TestNavigationStateHandler();
-        uriFragmentActionNavigatorWrapper = new UriFragmentActionNavigatorWrapper(new TestUI(), navigationStateHandler);
+        uriFragmentActionNavigatorWrapper = new UriFragmentActionNavigatorWrapper(new TestUI(), navigationStateHandler, null);
         uriActionMapperTree = UriActionMapperTree.create().buildMapperTree().build();
     }
 
