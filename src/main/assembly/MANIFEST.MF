@@ -3,5 +3,5 @@ Vaadin-Package-Version: 1
 Vaadin-Addon: jar/${project.build.finalName}.jar
 Vaadin-License-Title: Apache License 2.0
 Implementation-Vendor: Roland Krüger
-Implementation-Title: UriFragmentActionsForVaadin
+Implementation-Title: ${project.name}
 Implementation-Version: ${project.version}
