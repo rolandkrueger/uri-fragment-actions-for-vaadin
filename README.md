@@ -1,3 +1,6 @@
+![Vaadin 7.x](https://img.shields.io/badge/Vaadin-7.x-blue.svg)
+![Vaadin 8.x](https://img.shields.io/badge/Vaadin-8.x-ff69b4.svg)
+
 URI Fragment Actions for Vaadin
 ===============================
 
