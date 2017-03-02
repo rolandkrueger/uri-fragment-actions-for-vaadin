@@ -87,7 +87,6 @@ public class UriFragmentActionNavigatorWrapper {
      */
     private final Navigator navigator;
     private UriActionMapperTree uriActionMapperTree;
-    private UriActionCommand currentActionCommandObject;
     private Object routingContext;
 
     /**
@@ -198,13 +197,6 @@ public class UriFragmentActionNavigatorWrapper {
     }
 
     /**
-     * Sets the current action command object to null.
-     */
-    void resetCurrentActionCommand() {
-        currentActionCommandObject = null;
-    }
-
-    /**
      * {@link ViewDisplay} which delegates the task to display the current {@link View} to a wrapped {@link ViewDisplay}
      * if the {@link View} to be shown is <em>not</em> of type {@link ActionExecutionView}. The wrapped {@link
      * ViewDisplay} can be provided by one of the constructors which accepts either a {@link ComponentContainer},
@@ -232,24 +224,39 @@ public class UriFragmentActionNavigatorWrapper {
      * fragment could successfully be resolved.
      */
     private class UriActionViewProvider implements ViewProvider {
+        private ActionExecutionView currentView;
+        private String currentNavigationState;
+
         @Override
         public String getViewName(final String viewAndParameters) {
             if (uriActionMapperTree == null) {
                 return null;
             }
-            final UriActionCommand action = uriActionMapperTree.interpretFragment(viewAndParameters, routingContext, false);
-            if (currentActionCommandObject != null) {
-                throw new IllegalStateException(
-                        "Thread synchronization problem: this action navigator is currently handling another request. Current action is: "
-                                + currentActionCommandObject);
+            if (currentView != null && currentNavigationState != null) {
+                if (currentNavigationState.equals(viewAndParameters)) {
+                    return viewAndParameters;
+                } else {
+                    throw new IllegalStateException(
+                            "Access synchronization problem: this action navigator is currently handling another request. " +
+                                    "Currently handled navigation state is: " + currentNavigationState +
+                                    ". Current action is: " + currentView.getUriActionCommand());
+                }
             }
-            currentActionCommandObject = action;
+
+            final UriActionCommand action = uriActionMapperTree.interpretFragment(viewAndParameters, routingContext, false);
+            if (action != null) {
+                currentView = new ActionExecutionView(action);
+                currentNavigationState = viewAndParameters;
+            }
             return action != null ? viewAndParameters : null;
         }
 
         @Override
         public View getView(final String viewName) {
-            return new ActionExecutionView(UriFragmentActionNavigatorWrapper.this, currentActionCommandObject);
+            View returnedView = currentView;
+            currentNavigationState = null;
+            currentView = null;
+            return returnedView;
         }
     }
 }

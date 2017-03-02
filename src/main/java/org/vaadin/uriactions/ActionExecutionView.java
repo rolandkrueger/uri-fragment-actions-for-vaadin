@@ -19,19 +19,17 @@ import org.roklib.urifragmentrouting.UriActionCommand;
  */
 public class ActionExecutionView implements View {
     private final UriActionCommand command;
-    private final UriFragmentActionNavigatorWrapper uriFragmentActionNavigatorWrapper;
 
-    ActionExecutionView(final UriFragmentActionNavigatorWrapper uriFragmentActionNavigatorWrapper, final UriActionCommand command) {
-        Preconditions.checkNotNull(command);
-        Preconditions.checkNotNull(uriFragmentActionNavigatorWrapper);
+    ActionExecutionView(final UriActionCommand command) {
+        if (command == null) {
+            throw new IllegalArgumentException("action command object must not be null");
+        }
         this.command = command;
-        this.uriFragmentActionNavigatorWrapper = uriFragmentActionNavigatorWrapper;
     }
 
     @Override
     public void enter(final ViewChangeListener.ViewChangeEvent event) {
         command.run();
-        uriFragmentActionNavigatorWrapper.resetCurrentActionCommand();
     }
 
     /**
